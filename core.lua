@@ -1,5 +1,5 @@
--- Mist Rivals v1.8.4
-local VERSION = "1.8.4"
+-- Mist Rivals v1.8.5
+local VERSION = "1.8.5"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -54,7 +54,7 @@ local X = {
     closestPart = false,
     showFov = false,
     visualize = false,
-    fovColor = Color3.fromRGB(94, 184, 178),
+    fovColor = Color3.fromRGB(168, 142, 198),
     services = {
         rep = game:GetService("ReplicatedStorage"),
         plr = game:GetService("Players"),
@@ -235,16 +235,17 @@ Library:OnUnload(function()
 end)
 
 local Window = Library:CreateWindow({
-    Title = "mist · rivals · " .. VERSION,
+    Title = "mist · rivals",
     Center = true,
     AutoShow = true,
-    Size = UDim2.fromOffset(440, 460),
-    TabPadding = 6,
+    Size = UDim2.fromOffset(550, 600),
+    TabPadding = 8,
 })
 
 local CombatTab = Window:AddTab("combat")
 local CombatBox = CombatTab:AddLeftTabbox()
 local SilentTab = CombatBox:AddTab("silent aim")
+local AimbotTab = CombatBox:AddTab("aimbot")
 
 SilentTab:AddToggle("SilentAim", {
     Text = "enabled",
@@ -287,7 +288,7 @@ SilentTab:AddToggle("ShowFov", {
     Default = false,
     Callback = function(v) X.showFov = v end,
 }):AddColorPicker("FovColor", {
-    Default = Color3.fromRGB(94, 184, 178),
+    Default = Color3.fromRGB(168, 142, 198),
     Callback = function(c) X.fovColor = c end,
 })
 
