@@ -1,5 +1,5 @@
 -- mist boot · use this file if mist.lua is cached
-local EXPECTED_VERSION = "1.0.6"
+local EXPECTED_VERSION = "1.0.7"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -22,23 +22,6 @@ local function httpGet(url)
     error("[mist] no http method available")
 end
 
-local function runHood(src, chunkname)
-    if not src or #src < 50 then
-        error("[mist] empty response for " .. chunkname)
-    end
-
-    local fn, err = loadstring(src, chunkname)
-    if not fn then
-        error("[mist] compile failed (" .. chunkname .. "): " .. tostring(err))
-    end
-
-    if setfenv and getfenv then
-        setfenv(fn, getfenv(0))
-    end
-
-    return fn()
-end
-
 local function fetchHood()
     local bust = tostring(tick())
     local urls = {
@@ -54,7 +37,7 @@ local function fetchHood()
             and not src:find("sneeky-s-fov-lib", 1, true)
             and src:find('VERSION = "' .. EXPECTED_VERSION .. '"', 1, true)
         then
-            return src, url
+            return src
         end
     end
 
@@ -65,4 +48,4 @@ local function fetchHood()
     )
 end
 
-runHood(fetchHood())
+loadstring(fetchHood(), "hood.luau")()

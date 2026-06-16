@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.6
+-- mist · realistic hood testing v1.0.7
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.6"
+local VERSION = "1.0.7"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -227,26 +227,15 @@ if getgenv().Library and getgenv().Library.Unload then
 end
 
 local function fetchUrl(path)
+    if readfile and isfile and isfile(path) then
+        return readfile(path)
+    end
     local url = REPO .. path .. "?v=" .. VERSION .. "&b=" .. tostring(tick())
     return httpGet(url)
 end
 
 local function loadModule(path)
-    local src = fetchUrl(path)
-    if not src or #src < 50 then
-        error("[mist hood] empty response for " .. path)
-    end
-
-    local fn, err = loadstring(src, path)
-    if not fn then
-        error("[mist hood] compile " .. path .. ": " .. tostring(err))
-    end
-
-    if setfenv and getfenv then
-        setfenv(fn, getfenv(0))
-    end
-
-    return fn()
+    return loadstring(fetchUrl(path), path)()
 end
 
 local Library = loadModule("Example.lua")
