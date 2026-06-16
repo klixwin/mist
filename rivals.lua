@@ -1,5 +1,5 @@
--- Mist Rivals v1.8.2
-local VERSION = "1.8.2"
+-- Mist Rivals v1.8.3
+local VERSION = "1.8.3"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -34,6 +34,8 @@ local function unloadMist()
 end
 
 local Library = loadModule("Example.lua")
+Library.AccentColorDark = Library:GetDarkerColor(Library.AccentColor)
+Library:UpdateColorsUsingRegistry()
 local SaveManager = loadModule("Library.lua")
 local ThemeManager = loadModule("addons/ThemeManager.lua")
 
@@ -52,7 +54,7 @@ local X = {
     closestPart = false,
     showFov = false,
     visualize = false,
-    fovColor = Color3.fromRGB(255, 255, 255),
+    fovColor = Color3.fromRGB(94, 184, 178),
     services = {
         rep = game:GetService("ReplicatedStorage"),
         plr = game:GetService("Players"),
@@ -233,15 +235,16 @@ Library:OnUnload(function()
 end)
 
 local Window = Library:CreateWindow({
-    Title = "mist — rivals v" .. VERSION,
+    Title = "mist · rivals",
     Center = true,
     AutoShow = true,
+    Size = UDim2.fromOffset(440, 460),
+    TabPadding = 6,
 })
 
 local CombatTab = Window:AddTab("combat")
 local CombatBox = CombatTab:AddLeftTabbox()
 local SilentTab = CombatBox:AddTab("silent aim")
-local AimbotTab = CombatBox:AddTab("aimbot")
 
 SilentTab:AddToggle("SilentAim", {
     Text = "enabled",
@@ -284,7 +287,7 @@ SilentTab:AddToggle("ShowFov", {
     Default = false,
     Callback = function(v) X.showFov = v end,
 }):AddColorPicker("FovColor", {
-    Default = Color3.fromRGB(255, 255, 255),
+    Default = Color3.fromRGB(94, 184, 178),
     Callback = function(c) X.fovColor = c end,
 })
 
@@ -309,8 +312,6 @@ SilentTab:AddSlider("HitChance", {
     Rounding = 0,
     Callback = function(v) X.hitChance = v end,
 })
-
-AimbotTab:AddLabel("coming soon", true)
 
 local SettingsTab = Window:AddTab("settings")
 local MenuGroup = SettingsTab:AddLeftGroupbox("menu")
@@ -337,4 +338,4 @@ end
 task.spawn(setupSilentAim)
 setupFovCircle()
 
-Library:Notify("mist v" .. VERSION .. " loaded")
+Library:Notify("v" .. VERSION)

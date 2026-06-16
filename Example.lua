@@ -29,15 +29,15 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    OutlineColor = Color3.fromRGB(50, 50, 50);
-    RiskColor = Color3.fromRGB(255, 50, 50),
+    FontColor = Color3.fromRGB(210, 212, 218);
+    MainColor = Color3.fromRGB(18, 18, 22);
+    BackgroundColor = Color3.fromRGB(12, 12, 14);
+    AccentColor = Color3.fromRGB(94, 184, 178);
+    OutlineColor = Color3.fromRGB(32, 34, 40);
+    RiskColor = Color3.fromRGB(232, 106, 106),
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
+    Font = Enum.Font.GothamMedium,
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -2945,7 +2945,7 @@ function Library:CreateWindow(...)
     end
 
     if type(Config.Title) ~= 'string' then Config.Title = 'No title' end
-    if type(Config.TabPadding) ~= 'number' then Config.TabPadding = 0 end
+    if type(Config.TabPadding) ~= 'number' then Config.TabPadding = 6 end
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
 
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
@@ -2990,18 +2990,32 @@ function Library:CreateWindow(...)
 
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 0);
-        Size = UDim2.new(1, 0, 0, 25);
+        Size = UDim2.new(1, 0, 0, 26);
         Text = Config.Title or '';
+        TextSize = 13;
         TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 1;
         Parent = Inner;
     });
 
+    local TitleLine = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 14, 0, 25);
+        Size = UDim2.new(1, -28, 0, 1);
+        ZIndex = 2;
+        Parent = Inner;
+    });
+
+    Library:AddToRegistry(TitleLine, {
+        BackgroundColor3 = 'AccentColor';
+    });
+
     local MainSectionOuter = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor;
         BorderColor3 = Library.OutlineColor;
-        Position = UDim2.new(0, 8, 0, 25);
-        Size = UDim2.new(1, -16, 1, -33);
+        Position = UDim2.new(0, 8, 0, 28);
+        Size = UDim2.new(1, -16, 1, -36);
         ZIndex = 1;
         Parent = Inner;
     });
@@ -3219,7 +3233,7 @@ function Library:CreateWindow(...)
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Size = UDim2.new(1, 0, 0, 2);
+                Size = UDim2.new(1, 0, 0, 1);
                 ZIndex = 5;
                 Parent = BoxInner;
             });
@@ -3319,7 +3333,7 @@ function Library:CreateWindow(...)
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Size = UDim2.new(1, 0, 0, 2);
+                Size = UDim2.new(1, 0, 0, 1);
                 ZIndex = 10;
                 Parent = BoxInner;
             });
