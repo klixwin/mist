@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.0
+-- mist · realistic hood testing v1.0.1
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.0"
+local VERSION = "1.0.1"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -19,7 +19,28 @@ local function httpGet(url)
             return res.Body
         end
     end
-    return game:HttpGet(url)
+    local ok, body = pcall(game.HttpGet, game, url)
+    if ok and body then
+        return body
+    end
+    error("[mist hood] no http method available")
+end
+
+local function compile(src, chunkname)
+    if not src or #src < 50 then
+        error("[mist hood] empty response for " .. chunkname)
+    end
+    local fn, err
+    if loadstring then
+        fn, err = loadstring(src, chunkname)
+    end
+    if not fn and load then
+        fn, err = load(src, chunkname)
+    end
+    if not fn then
+        error("[mist hood] compile failed (" .. chunkname .. "): " .. tostring(err))
+    end
+    return fn
 end
 
 local function normalizeVersion(text)
@@ -209,12 +230,12 @@ local function fetchUrl(path)
     return httpGet(url)
 end
 
-local Library = loadstring(fetchUrl("Example.lua"), "Example.lua")()
+local Library = compile(fetchUrl("Example.lua"), "Example.lua")()
 Library.AccentColorDark = Library:GetDarkerColor(Library.AccentColor)
 Library:UpdateColorsUsingRegistry()
 
-local SaveManager = loadstring(fetchUrl("Library.lua"), "Library.lua")()
-local ThemeManager = loadstring(fetchUrl("addons/ThemeManager.lua"), "ThemeManager.lua")()
+local SaveManager = compile(fetchUrl("Library.lua"), "Library.lua")()
+local ThemeManager = compile(fetchUrl("addons/ThemeManager.lua"), "ThemeManager.lua")()
 
 SaveManager:SetLibrary(Library)
 ThemeManager:SetLibrary(Library)
