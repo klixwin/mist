@@ -1,2 +1,1 @@
--- Redirect: use rivals.lua (mist.lua URL is often cached by executors)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/klixwin/mist/main/rivals.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/loader.lua"))()
