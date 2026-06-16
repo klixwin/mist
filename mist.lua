@@ -1,13 +1,14 @@
+-- Mist Rivals v1.3
+local VERSION = "1.3"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
 
+if getgenv().Library and getgenv().Library.Unload then
+    pcall(getgenv().Library.Unload, getgenv().Library)
+end
+
 local function loadModule(path)
-    local paths = { path, "mist/" .. path, "script/" .. path }
-    for _, p in ipairs(paths) do
-        if readfile and isfile and isfile(p) then
-            return loadstring(readfile(p), p)()
-        end
-    end
-    return loadstring(game:HttpGet(REPO .. path), path)()
+    local url = REPO .. path
+    return loadstring(game:HttpGet(url), path)()
 end
 
 local Library = loadModule("Example.lua")
@@ -138,7 +139,7 @@ local function setupSilentAim()
 end
 
 local Window = Library:CreateWindow({
-    Title = "Mist — Rivals",
+    Title = "Mist — Rivals v" .. VERSION,
     Center = true,
     AutoShow = true,
 })
@@ -201,4 +202,4 @@ end
 
 task.spawn(setupSilentAim)
 
-Library:Notify("Mist loaded — press Insert to toggle UI")
+Library:Notify("Mist v" .. VERSION .. " — Insert toggles UI")
