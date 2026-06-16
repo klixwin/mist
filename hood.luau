@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.1
+-- mist · realistic hood testing v1.0.2
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.1"
+local VERSION = "1.0.2"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -164,7 +164,7 @@ local function getGuiRoots()
     return roots
 end
 
-function getgenv().MistCleanupSneekyFOV()
+getgenv().MistCleanupSneekyFOV = function()
     for _, key in sneekyEnvKeys() do
         destroySneekyState(getgenv()[key])
         getgenv()[key] = nil
