@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://cdn.jsdelivr.net/gh/klixwin/mist@main/hood.lua?b=" .. tostring(tick())))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/hood.lua?b=" .. tostring(tick())))()
