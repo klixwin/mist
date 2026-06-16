@@ -27,7 +27,14 @@ local function normalizeVersion(text)
     return text:match("^v?([%d%.]+)$") or text:match("([%d%.]+)") or text
 end
 
-local remoteVersion = normalizeVersion(httpGet(REPO .. "version.txt?b=" .. tostring(tick())))
+local function getExpectedVersion()
+    if readfile and isfile and isfile("version.txt") then
+        return normalizeVersion(readfile("version.txt"))
+    end
+    return normalizeVersion(httpGet(REPO .. "version.txt?b=" .. tostring(tick())))
+end
+
+local remoteVersion = getExpectedVersion()
 local localVersion = normalizeVersion(VERSION)
 
 if localVersion ~= remoteVersion then
