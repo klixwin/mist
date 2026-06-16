@@ -1,14 +1,37 @@
--- Mist Rivals v1.5
-local VERSION = "1.5"
+-- Mist Rivals v1.6
+local VERSION = "1.6"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
+
+getgenv().MistVersion = VERSION
 
 if getgenv().Library and getgenv().Library.Unload then
     pcall(getgenv().Library.Unload, getgenv().Library)
 end
 
+local function fetchUrl(path)
+    local bust = VERSION .. "_" .. tostring(os.time())
+    local url = REPO .. path .. "?v=" .. bust
+    if syn and syn.request then
+        local res = syn.request({ Url = url, Method = "GET" })
+        if res and res.Body then
+            return res.Body
+        end
+    end
+    if http and http.request then
+        local res = http.request({ Url = url, Method = "GET" })
+        if res and res.Body then
+            return res.Body
+        end
+    end
+    return game:HttpGet(url)
+end
+
 local function loadModule(path)
-    local url = REPO .. path
-    return loadstring(game:HttpGet(url), path)()
+    return loadstring(fetchUrl(path), path)()
+end
+
+local function unloadMist()
+    Library:Unload()
 end
 
 local Library = loadModule("Example.lua")
@@ -139,6 +162,17 @@ local function setupSilentAim()
     Library:Notify("Silent aim active")
 end
 
+Library:OnUnload(function()
+    if heartbeatConn then
+        heartbeatConn:Disconnect()
+        heartbeatConn = nil
+    end
+    if X.mod and X.original then
+        X.mod.Raycast = X.original
+    end
+    getgenv().MistVersion = nil
+end)
+
 local Window = Library:CreateWindow({
     Title = "Mist — Rivals v" .. VERSION,
     Center = true,
@@ -182,25 +216,14 @@ Main:AddSlider("FOV", {
     Callback = function(v) X.range = v end,
 })
 
+Main:AddDivider()
+Main:AddButton("Unload UI", unloadMist)
+
 local SettingsTab = Window:AddTab("Settings")
-
-Library:OnUnload(function()
-    if heartbeatConn then
-        heartbeatConn:Disconnect()
-        heartbeatConn = nil
-    end
-    if X.mod and X.original then
-        X.mod.Raycast = X.original
-    end
-end)
-
-local ScriptGroup = SettingsTab:AddRightGroupbox("Script")
-
-ScriptGroup:AddButton("Unload UI", function()
-    Library:Unload()
-end)
-
 local MenuGroup = SettingsTab:AddLeftGroupbox("Menu")
+
+MenuGroup:AddButton("Unload UI", unloadMist)
+MenuGroup:AddDivider()
 
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
     Default = "Insert",
@@ -220,4 +243,4 @@ end
 
 task.spawn(setupSilentAim)
 
-Library:Notify("Mist v" .. VERSION .. " — Insert toggles UI")
+Library:Notify("Mist v" .. VERSION .. " loaded — Unload UI in Combat tab")
