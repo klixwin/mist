@@ -1,5 +1,5 @@
--- Mist Rivals v1.7.4
-local VERSION = "1.7.4"
+-- Mist Rivals v1.8.0
+local VERSION = "1.8.0"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -45,9 +45,14 @@ SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 local X = {
     enabled = true,
     bone = "Head",
-    range = math.huge,
+    range = 310,
+    hitChance = 100,
     visibleOnly = true,
     teamCheck = true,
+    closestPart = false,
+    showFov = false,
+    visualize = false,
+    fovColor = Color3.fromRGB(255, 255, 255),
     services = {
         rep = game:GetService("ReplicatedStorage"),
         plr = game:GetService("Players"),
@@ -62,6 +67,8 @@ rayParams.FilterType = Enum.RaycastFilterType.Exclude
 rayParams.IgnoreWater = true
 local rayFilter = {}
 local heartbeatConn = nil
+local fovConn = nil
+local fovCircle = Drawing and Drawing.new("Circle")
 
 local function rebuildPool()
     table.clear(pool)
@@ -103,6 +110,49 @@ local function isVisible(char, bonePos)
     return not hit or hit.Instance:IsDescendantOf(char)
 end
 
+local function getAimPart(char)
+    if X.closestPart then
+        local best, bestD = nil, math.huge
+        for _, p in char:GetDescendants() do
+            if p:IsA("BasePart") then
+                local pos, vis = X.cam:WorldToViewportPoint(p.Position)
+                if vis then
+                    local d = (Vector2.new(cx, cy) - Vector2.new(pos.X, pos.Y)).Magnitude
+                    if d < bestD then
+                        best, bestD = p, d
+                    end
+                end
+            end
+        end
+        return best
+    end
+    return char:FindFirstChild(X.bone)
+end
+
+local function setupFovCircle()
+    if not fovCircle then return end
+    fovCircle.Thickness = 1
+    fovCircle.Filled = false
+    fovCircle.NumSides = 64
+    fovCircle.Transparency = 1
+    fovCircle.Visible = false
+    fovCircle.Color = X.fovColor
+
+    fovConn = X.services.run.RenderStepped:Connect(function()
+        local show = X.showFov or X.visualize
+        if not show or not X.cam then
+            fovCircle.Visible = false
+            return
+        end
+        fovCircle.Visible = true
+        fovCircle.Position = Vector2.new(cx, cy)
+        fovCircle.Radius = X.range
+        fovCircle.Color = X.fovColor
+        fovCircle.Filled = X.visualize
+        fovCircle.Transparency = X.visualize and 0.55 or 1
+    end)
+end
+
 local function setupSilentAim()
     local modules = X.services.rep:WaitForChild("Modules", 15)
     if not modules then
@@ -137,22 +187,25 @@ local function setupSilentAim()
         if dir.Magnitude > 0 and dir.Unit.Y < -0.7 then
             return X.original(...)
         end
+        if X.hitChance < 100 and math.random(1, 100) > X.hitChance then
+            return X.original(...)
+        end
         local winner, record = nil, X.range
         for i = 1, #pool do
             local v = pool[i]
             if sameTeam(v) then continue end
-            local bone = v:FindFirstChild(X.bone)
+            local bone = getAimPart(v)
             if not bone then continue end
             local p, vis = X.cam:WorldToViewportPoint(bone.Position)
             if not vis then continue end
             if X.visibleOnly and not isVisible(v, bone.Position) then continue end
             local d = (Vector2.new(cx, cy) - Vector2.new(p.X, p.Y)).Magnitude
-            if d < record then
+            if d <= X.range and d < record then
                 winner, record = v, d
             end
         end
         if winner then
-            local bone = winner:FindFirstChild(X.bone)
+            local bone = getAimPart(winner)
             if bone then args[3] = bone.Position end
         end
         return X.original(table.unpack(args))
@@ -165,6 +218,13 @@ Library:OnUnload(function()
     if heartbeatConn then
         heartbeatConn:Disconnect()
         heartbeatConn = nil
+    end
+    if fovConn then
+        fovConn:Disconnect()
+        fovConn = nil
+    end
+    if fovCircle then
+        fovCircle:Remove()
     end
     if X.mod and X.original then
         X.mod.Raycast = X.original
@@ -179,50 +239,78 @@ local Window = Library:CreateWindow({
 })
 
 local CombatTab = Window:AddTab("combat")
-local Main = CombatTab:AddLeftGroupbox("silent aim")
+local CombatBox = CombatTab:AddLeftTabbox()
+local SilentTab = CombatBox:AddTab("silent aim")
+local AimbotTab = CombatBox:AddTab("aimbot")
 
-local boneMap = {
-    head = "Head",
-    humanoidrootpart = "HumanoidRootPart",
-    uppertorso = "UpperTorso",
-}
-
-Main:AddToggle("SilentAim", {
+SilentTab:AddToggle("SilentAim", {
     Text = "enabled",
     Default = true,
     Callback = function(v) X.enabled = v end,
+}):AddKeyPicker("SilentAimKey", {
+    Default = "None",
+    SyncToggleState = true,
+    Mode = "Toggle",
+    Text = "silent aim",
+    NoUI = true,
 })
 
-Main:AddToggle("VisibleOnly", {
+SilentTab:AddToggle("VisibleOnly", {
     Text = "visible only",
     Default = true,
     Callback = function(v) X.visibleOnly = v end,
 })
 
-Main:AddToggle("TeamCheck", {
+SilentTab:AddToggle("TeamCheck", {
     Text = "team check",
     Default = true,
     Callback = function(v) X.teamCheck = v end,
 })
 
-Main:AddDropdown("TargetBone", {
-    Text = "target bone",
-    Values = { "head", "humanoidrootpart", "uppertorso" },
-    Default = 1,
-    Callback = function(v) X.bone = boneMap[v] or v end,
+SilentTab:AddToggle("ClosestPart", {
+    Text = "closest part",
+    Default = false,
+    Callback = function(v) X.closestPart = v end,
 })
 
-Main:AddSlider("FOV", {
-    Text = "fov radius",
-    Default = 500,
+SilentTab:AddToggle("Visualize", {
+    Text = "visualize",
+    Default = false,
+    Callback = function(v) X.visualize = v end,
+})
+
+SilentTab:AddToggle("ShowFov", {
+    Text = "show fov",
+    Default = false,
+    Callback = function(v) X.showFov = v end,
+}):AddColorPicker("FovColor", {
+    Default = Color3.fromRGB(255, 255, 255),
+    Callback = function(c) X.fovColor = c end,
+})
+
+SilentTab:AddSlider("Radius", {
+    Text = "radius",
+    Suffix = "px",
+    Compact = true,
+    Default = 310,
     Min = 50,
-    Max = 1000,
+    Max = 500,
     Rounding = 0,
     Callback = function(v) X.range = v end,
 })
 
-Main:AddDivider()
-Main:AddButton("unload ui", unloadMist)
+SilentTab:AddSlider("HitChance", {
+    Text = "hit chance",
+    Suffix = "%",
+    Compact = true,
+    Default = 100,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(v) X.hitChance = v end,
+})
+
+AimbotTab:AddLabel("coming soon", true)
 
 local SettingsTab = Window:AddTab("settings")
 local MenuGroup = SettingsTab:AddLeftGroupbox("menu")
@@ -247,5 +335,6 @@ if writefile then
 end
 
 task.spawn(setupSilentAim)
+setupFovCircle()
 
 Library:Notify("mist v" .. VERSION .. " loaded")

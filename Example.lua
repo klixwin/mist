@@ -2042,6 +2042,7 @@ do
             Size = UDim2.new(1, 0, 1, 0);
             TextSize = 14;
             Text = 'Infinite';
+            TextXAlignment = Enum.TextXAlignment.Center;
             ZIndex = 9;
             Parent = SliderInner;
         });
