@@ -1,5 +1,5 @@
--- Mist Rivals v1.7.1
-local VERSION = "1.7.1"
+-- Mist Rivals v1.7.2
+local VERSION = "1.7.2"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
 
 getgenv().MistVersion = VERSION
