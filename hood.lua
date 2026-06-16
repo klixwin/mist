@@ -1,10 +1,44 @@
--- mist · realistic hood testing v1.0.3
+-- mist · realistic hood testing v1.0.0
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.3"
+local VERSION = "1.0.0"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
+
+local function httpGet(url)
+    if syn and syn.request then
+        local res = syn.request({ Url = url, Method = "GET" })
+        if res and res.Body then
+            return res.Body
+        end
+    end
+    if http and http.request then
+        local res = http.request({ Url = url, Method = "GET" })
+        if res and res.Body then
+            return res.Body
+        end
+    end
+    return game:HttpGet(url)
+end
+
+local function normalizeVersion(text)
+    text = (text or ""):gsub("%s+", "")
+    return text:match("^v?([%d%.]+)$") or text:match("([%d%.]+)") or text
+end
+
+local remoteVersion = normalizeVersion(httpGet(REPO .. "version.txt?b=" .. tostring(tick())))
+local localVersion = normalizeVersion(VERSION)
+
+if localVersion ~= remoteVersion then
+    error(
+        "[mist hood] version mismatch — script v"
+            .. localVersion
+            .. " but github v"
+            .. remoteVersion
+            .. " (use loader-hood.lua)"
+    )
+end
 
 local cloneref = cloneref or function(i)
     return i
