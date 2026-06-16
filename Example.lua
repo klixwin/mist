@@ -29,11 +29,11 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(198, 200, 206);
-    MainColor = Color3.fromRGB(22, 22, 26);
-    BackgroundColor = Color3.fromRGB(16, 16, 19);
-    AccentColor = Color3.fromRGB(168, 142, 198);
-    OutlineColor = Color3.fromRGB(40, 42, 50);
+    FontColor = Color3.fromRGB(210, 214, 222);
+    MainColor = Color3.fromRGB(20, 22, 28);
+    BackgroundColor = Color3.fromRGB(14, 16, 22);
+    AccentColor = Color3.fromRGB(88, 142, 228);
+    OutlineColor = Color3.fromRGB(38, 42, 54);
     RiskColor = Color3.fromRGB(220, 96, 96),
 
     Black = Color3.new(0, 0, 0);
@@ -3132,12 +3132,13 @@ function Library:CreateWindow(...)
         local LeftSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
-            Position = UDim2.new(0, 8 - 1, 0, 8 - 1);
-            Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
+            Position = UDim2.new(0, 7, 0, 7);
+            Size = UDim2.new(0.5, -11, 1, -14);
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = '';
             TopImage = '';
-            ScrollBarThickness = 0;
+            ScrollBarThickness = 4;
+            ScrollBarImageColor3 = Library.AccentColor;
             ZIndex = 2;
             Parent = TabFrame;
         });
@@ -3145,12 +3146,13 @@ function Library:CreateWindow(...)
         local RightSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
-            Position = UDim2.new(0.5, 4 + 1, 0, 8 - 1);
-            Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
+            Position = UDim2.new(0.5, 5, 0, 7);
+            Size = UDim2.new(0.5, -11, 1, -14);
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = '';
             TopImage = '';
-            ScrollBarThickness = 0;
+            ScrollBarThickness = 4;
+            ScrollBarImageColor3 = Library.AccentColor;
             ZIndex = 2;
             Parent = TabFrame;
         });
@@ -3207,7 +3209,7 @@ function Library:CreateWindow(...)
                 BackgroundColor3 = Library.BackgroundColor;
                 BorderColor3 = Library.OutlineColor;
                 BorderMode = Enum.BorderMode.Inset;
-                Size = UDim2.new(1, 0, 0, 507 + 2);
+                Size = UDim2.new(1, 0, 0, 100);
                 ZIndex = 2;
                 Parent = Info.Side == 1 and LeftSide or RightSide;
             });
@@ -3231,10 +3233,22 @@ function Library:CreateWindow(...)
                 BackgroundColor3 = 'BackgroundColor';
             });
 
+            local Highlight = Library:Create('Frame', {
+                BackgroundColor3 = Library.AccentColor;
+                BorderSizePixel = 0;
+                Size = UDim2.new(1, 0, 0, 1);
+                ZIndex = 5;
+                Parent = BoxInner;
+            });
+
+            Library:AddToRegistry(Highlight, {
+                BackgroundColor3 = 'AccentColor';
+            });
+
             local GroupboxLabel = Library:CreateLabel({
-                Size = UDim2.new(1, -14, 0, 16);
-                Position = UDim2.new(0, 8, 0, 8);
-                TextSize = 12;
+                Size = UDim2.new(1, -12, 0, 18);
+                Position = UDim2.new(0, 8, 0, 6);
+                TextSize = 13;
                 Text = Info.Name;
                 TextXAlignment = Enum.TextXAlignment.Left;
                 ZIndex = 5;
@@ -3243,8 +3257,8 @@ function Library:CreateWindow(...)
 
             local Container = Library:Create('Frame', {
                 BackgroundTransparency = 1;
-                Position = UDim2.new(0, 6, 0, 26);
-                Size = UDim2.new(1, -10, 1, -28);
+                Position = UDim2.new(0, 6, 0, 28);
+                Size = UDim2.new(1, -10, 1, -30);
                 ZIndex = 1;
                 Parent = BoxInner;
             });
@@ -3264,7 +3278,7 @@ function Library:CreateWindow(...)
                     end;
                 end;
 
-                BoxOuter.Size = UDim2.new(1, 0, 0, 24 + Size + 2 + 2);
+                BoxOuter.Size = UDim2.new(1, 0, 0, 28 + Size + 4);
             end;
 
             Groupbox.Container = Container;

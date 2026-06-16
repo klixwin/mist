@@ -1,5 +1,5 @@
--- Mist Rivals v1.8.5
-local VERSION = "1.8.5"
+-- Mist Rivals v1.8.6
+local VERSION = "1.8.6"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -54,7 +54,7 @@ local X = {
     closestPart = false,
     showFov = false,
     visualize = false,
-    fovColor = Color3.fromRGB(168, 142, 198),
+    fovColor = Color3.fromRGB(88, 142, 228),
     services = {
         rep = game:GetService("ReplicatedStorage"),
         plr = game:GetService("Players"),
@@ -238,16 +238,12 @@ local Window = Library:CreateWindow({
     Title = "mist · rivals",
     Center = true,
     AutoShow = true,
-    Size = UDim2.fromOffset(550, 600),
-    TabPadding = 8,
 })
 
 local CombatTab = Window:AddTab("combat")
-local CombatBox = CombatTab:AddLeftTabbox()
-local SilentTab = CombatBox:AddTab("silent aim")
-local AimbotTab = CombatBox:AddTab("aimbot")
+local Silent = CombatTab:AddLeftGroupbox("silent aim")
 
-SilentTab:AddToggle("SilentAim", {
+Silent:AddToggle("SilentAim", {
     Text = "enabled",
     Default = true,
     Callback = function(v) X.enabled = v end,
@@ -259,40 +255,40 @@ SilentTab:AddToggle("SilentAim", {
     NoUI = true,
 })
 
-SilentTab:AddToggle("VisibleOnly", {
+Silent:AddToggle("VisibleOnly", {
     Text = "visible only",
     Default = true,
     Callback = function(v) X.visibleOnly = v end,
 })
 
-SilentTab:AddToggle("TeamCheck", {
+Silent:AddToggle("TeamCheck", {
     Text = "team check",
     Default = true,
     Callback = function(v) X.teamCheck = v end,
 })
 
-SilentTab:AddToggle("ClosestPart", {
+Silent:AddToggle("ClosestPart", {
     Text = "closest part",
     Default = false,
     Callback = function(v) X.closestPart = v end,
 })
 
-SilentTab:AddToggle("Visualize", {
+Silent:AddToggle("Visualize", {
     Text = "visualize",
     Default = false,
     Callback = function(v) X.visualize = v end,
 })
 
-SilentTab:AddToggle("ShowFov", {
+Silent:AddToggle("ShowFov", {
     Text = "show fov",
     Default = false,
     Callback = function(v) X.showFov = v end,
 }):AddColorPicker("FovColor", {
-    Default = Color3.fromRGB(168, 142, 198),
+    Default = Color3.fromRGB(88, 142, 228),
     Callback = function(c) X.fovColor = c end,
 })
 
-SilentTab:AddSlider("Radius", {
+Silent:AddSlider("Radius", {
     Text = "radius",
     Suffix = "px",
     Compact = true,
@@ -303,7 +299,7 @@ SilentTab:AddSlider("Radius", {
     Callback = function(v) X.range = v end,
 })
 
-SilentTab:AddSlider("HitChance", {
+Silent:AddSlider("HitChance", {
     Text = "hit chance",
     Suffix = "%",
     Compact = true,
@@ -313,6 +309,12 @@ SilentTab:AddSlider("HitChance", {
     Rounding = 0,
     Callback = function(v) X.hitChance = v end,
 })
+
+local Misc = CombatTab:AddRightGroupbox("misc")
+Misc:AddLabel("insert — toggle ui", true)
+Misc:AddLabel("unload — settings tab", true)
+Misc:AddDivider()
+Misc:AddLabel("v" .. VERSION, true)
 
 local SettingsTab = Window:AddTab("settings")
 local MenuGroup = SettingsTab:AddLeftGroupbox("menu")
