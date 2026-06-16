@@ -1,5 +1,5 @@
--- Mist Rivals v1.4
-local VERSION = "1.4"
+-- Mist Rivals v1.5
+local VERSION = "1.5"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
 
 if getgenv().Library and getgenv().Library.Unload then
@@ -39,6 +39,7 @@ local rayParams = RaycastParams.new()
 rayParams.FilterType = Enum.RaycastFilterType.Exclude
 rayParams.IgnoreWater = true
 local rayFilter = {}
+local heartbeatConn = nil
 
 local function rebuildPool()
     table.clear(pool)
@@ -97,7 +98,7 @@ local function setupSilentAim()
     X.cam = workspace.CurrentCamera
     X.me = X.services.plr.LocalPlayer
 
-    X.services.run.Heartbeat:Connect(function()
+    heartbeatConn = X.services.run.Heartbeat:Connect(function()
         if X.cam then
             cx = X.cam.ViewportSize.X / 2
             cy = X.cam.ViewportSize.Y / 2
@@ -182,6 +183,23 @@ Main:AddSlider("FOV", {
 })
 
 local SettingsTab = Window:AddTab("Settings")
+
+Library:OnUnload(function()
+    if heartbeatConn then
+        heartbeatConn:Disconnect()
+        heartbeatConn = nil
+    end
+    if X.mod and X.original then
+        X.mod.Raycast = X.original
+    end
+end)
+
+local ScriptGroup = SettingsTab:AddRightGroupbox("Script")
+
+ScriptGroup:AddButton("Unload UI", function()
+    Library:Unload()
+end)
+
 local MenuGroup = SettingsTab:AddLeftGroupbox("Menu")
 
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
@@ -192,16 +210,6 @@ MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
 })
 
 Library.ToggleKeybind = Options.MenuKeybind
-
-MenuGroup:AddButton("Unload UI", function()
-    Library:Unload()
-end)
-
-Library:OnUnload(function()
-    if X.mod and X.original then
-        X.mod.Raycast = X.original
-    end
-end)
 
 ThemeManager:ApplyToTab(SettingsTab)
 SaveManager:BuildConfigSection(SettingsTab)
