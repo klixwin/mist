@@ -1,4 +1,4 @@
-local EXPECTED_VERSION = "1.0.4"
+local EXPECTED_VERSION = "1.0.5"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -21,35 +21,21 @@ local function httpGet(url)
     error("[mist] no http method available")
 end
 
-local function getExecEnv()
-    if getgenv then
-        return getgenv()
-    end
-    if getfenv then
-        return getfenv(0)
-    end
-    return _G
-end
-
-local function compile(src, chunkname)
+local function runHood(src, chunkname)
     if not src or #src < 50 then
         error("[mist] empty response for " .. chunkname)
     end
-    local env = getExecEnv()
-    local fn, err
-    if load then
-        fn, err = load(src, chunkname, "t", env)
-    end
-    if not fn and loadstring then
-        fn, err = loadstring(src, chunkname)
-        if fn and setfenv then
-            setfenv(fn, env)
-        end
-    end
+
+    local fn, err = loadstring(src, chunkname)
     if not fn then
         error("[mist] compile failed (" .. chunkname .. "): " .. tostring(err))
     end
-    return fn
+
+    if setfenv and getfenv then
+        setfenv(fn, getfenv(0))
+    end
+
+    return fn()
 end
 
 local function fetchHood()
@@ -85,4 +71,4 @@ if remoteVer ~= EXPECTED_VERSION then
 end
 
 local src, url = fetchHood()
-compile(src, url)()
+runHood(src, url)

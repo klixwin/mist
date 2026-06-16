@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.4
+-- mist · realistic hood testing v1.0.5
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.4"
+local VERSION = "1.0.5"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -24,37 +24,6 @@ local function httpGet(url)
         return body
     end
     error("[mist hood] no http method available")
-end
-
-local function getExecEnv()
-    if getgenv then
-        return getgenv()
-    end
-    if getfenv then
-        return getfenv(0)
-    end
-    return _G
-end
-
-local function compile(src, chunkname)
-    if not src or #src < 50 then
-        error("[mist hood] empty response for " .. chunkname)
-    end
-    local env = getExecEnv()
-    local fn, err
-    if load then
-        fn, err = load(src, chunkname, "t", env)
-    end
-    if not fn and loadstring then
-        fn, err = loadstring(src, chunkname)
-        if fn and setfenv then
-            setfenv(fn, env)
-        end
-    end
-    if not fn then
-        error("[mist hood] compile failed (" .. chunkname .. "): " .. tostring(err))
-    end
-    return fn
 end
 
 local function normalizeVersion(text)
@@ -244,12 +213,30 @@ local function fetchUrl(path)
     return httpGet(url)
 end
 
-local Library = compile(fetchUrl("Example.lua"), "Example.lua")()
+local function loadModule(path)
+    local src = fetchUrl(path)
+    if not src or #src < 50 then
+        error("[mist hood] empty response for " .. path)
+    end
+
+    local fn, err = loadstring(src, path)
+    if not fn then
+        error("[mist hood] compile " .. path .. ": " .. tostring(err))
+    end
+
+    if setfenv and getfenv then
+        setfenv(fn, getfenv(0))
+    end
+
+    return fn()
+end
+
+local Library = loadModule("Example.lua")
 Library.AccentColorDark = Library:GetDarkerColor(Library.AccentColor)
 Library:UpdateColorsUsingRegistry()
 
-local SaveManager = compile(fetchUrl("Library.lua"), "Library.lua")()
-local ThemeManager = compile(fetchUrl("addons/ThemeManager.lua"), "ThemeManager.lua")()
+local SaveManager = loadModule("Library.lua")
+local ThemeManager = loadModule("addons/ThemeManager.lua")
 
 SaveManager:SetLibrary(Library)
 ThemeManager:SetLibrary(Library)
