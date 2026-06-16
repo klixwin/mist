@@ -1,5 +1,5 @@
--- Mist Rivals v1.7
-local VERSION = "1.7"
+-- Mist Rivals v1.7.1
+local VERSION = "1.7.1"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
 
 getgenv().MistVersion = VERSION
@@ -9,8 +9,7 @@ if getgenv().Library and getgenv().Library.Unload then
 end
 
 local function fetchUrl(path)
-    local bust = VERSION .. "_" .. tostring(os.time())
-    local url = REPO .. path .. "?v=" .. bust
+    local url = REPO .. path .. "?v=" .. VERSION
     if syn and syn.request then
         local res = syn.request({ Url = url, Method = "GET" })
         if res and res.Body then
