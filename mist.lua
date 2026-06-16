@@ -64,11 +64,5 @@ local function fetchHood()
     )
 end
 
-local remoteVer = httpGet(REPO .. "version.txt?b=" .. tostring(tick()))
-remoteVer = remoteVer:gsub("%s+", ""):match("v?([%d%.]+)")
-if remoteVer ~= EXPECTED_VERSION then
-    error("[mist] version.txt is v" .. tostring(remoteVer) .. " expected v" .. EXPECTED_VERSION)
-end
-
 local src, url = fetchHood()
 runHood(src, url)

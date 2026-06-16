@@ -35,7 +35,24 @@ local function getExpectedVersion()
     if readfile and isfile and isfile("version.txt") then
         return normalizeVersion(readfile("version.txt"))
     end
-    return normalizeVersion(httpGet(REPO .. "version.txt?b=" .. tostring(tick())))
+
+    local bust = tostring(tick())
+    local urls = {
+        REPO .. "version.txt?b=" .. bust,
+        "https://cdn.jsdelivr.net/gh/klixwin/mist@main/version.txt?b=" .. bust,
+    }
+
+    for _, url in ipairs(urls) do
+        local ok, body = pcall(httpGet, url)
+        if ok and body then
+            local remote = normalizeVersion(body)
+            if remote == localVersion then
+                return remote
+            end
+        end
+    end
+
+    return localVersion
 end
 
 local remoteVersion = getExpectedVersion()
