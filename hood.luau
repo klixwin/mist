@@ -36,7 +36,6 @@ if localVersion ~= remoteVersion then
             .. localVersion
             .. " but github v"
             .. remoteVersion
-            .. " (use loader-hood.lua)"
     )
 end
 
@@ -200,19 +199,7 @@ end
 
 local function fetchUrl(path)
     local url = REPO .. path .. "?v=" .. VERSION .. "&b=" .. tostring(tick())
-    if syn and syn.request then
-        local res = syn.request({ Url = url, Method = "GET" })
-        if res and res.Body then
-            return res.Body
-        end
-    end
-    if http and http.request then
-        local res = http.request({ Url = url, Method = "GET" })
-        if res and res.Body then
-            return res.Body
-        end
-    end
-    return game:HttpGet(url)
+    return httpGet(url)
 end
 
 local Library = loadstring(fetchUrl("Example.lua"), "Example.lua")()
