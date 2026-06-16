@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.2
+-- mist · realistic hood testing v1.0.3
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.2"
+local VERSION = "1.0.3"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -31,11 +31,11 @@ local function compile(src, chunkname)
         error("[mist hood] empty response for " .. chunkname)
     end
     local fn, err
-    if loadstring then
-        fn, err = loadstring(src, chunkname)
-    end
-    if not fn and load then
+    if load then
         fn, err = load(src, chunkname)
+    end
+    if not fn and loadstring then
+        fn, err = loadstring(src, chunkname)
     end
     if not fn then
         error("[mist hood] compile failed (" .. chunkname .. "): " .. tostring(err))
@@ -89,10 +89,10 @@ local function destroySneekyState(state)
 
     pcall(function()
         local draw = state.draw_instance
-        if draw and typeof(draw.terminate) == "function" then
+        if draw and type(draw.terminate) == "function" then
             draw:terminate()
         end
-        if draw and typeof(draw.stop) == "function" then
+        if draw and type(draw.stop) == "function" then
             draw:stop()
         end
     end)
