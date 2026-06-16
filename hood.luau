@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.7
+-- mist · realistic hood testing v1.0.8
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.7"
+local VERSION = "1.0.8"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
