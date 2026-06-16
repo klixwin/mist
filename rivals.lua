@@ -1,5 +1,5 @@
--- Mist Rivals v1.8.0
-local VERSION = "1.8.0"
+-- Mist Rivals v1.8.1
+local VERSION = "1.8.1"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -233,7 +233,7 @@ Library:OnUnload(function()
 end)
 
 local Window = Library:CreateWindow({
-    Title = "Mist — Rivals v" .. VERSION,
+    Title = "mist — rivals v" .. VERSION,
     Center = true,
     AutoShow = true,
 })
