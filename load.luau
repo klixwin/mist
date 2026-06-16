@@ -1,4 +1,4 @@
--- mist loader v1.0.6 (no version.txt gate — hood.luau VERSION is checked)
+-- mist boot · use this file if mist.lua is cached
 local EXPECTED_VERSION = "1.0.6"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
@@ -61,7 +61,7 @@ local function fetchHood()
     error(
         "[mist] could not fetch hood.luau v"
             .. EXPECTED_VERSION
-            .. " — use load.luau or hood.luau direct"
+            .. " — try loadstring(readfile('hood.luau'))()"
     )
 end
 
