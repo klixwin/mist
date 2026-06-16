@@ -1,5 +1,5 @@
--- Mist Rivals v1.7.3
-local VERSION = "1.7.3"
+-- Mist Rivals v1.7.4
+local VERSION = "1.7.4"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 getgenv().MistVersion = VERSION
@@ -106,12 +106,12 @@ end
 local function setupSilentAim()
     local modules = X.services.rep:WaitForChild("Modules", 15)
     if not modules then
-        Library:Notify("Rivals not detected — silent aim disabled", 5)
+        Library:Notify("rivals not detected — silent aim disabled", 5)
         return
     end
     local utility = modules:WaitForChild("Utility", 10)
     if not utility then
-        Library:Notify("Utility module missing — silent aim disabled", 5)
+        Library:Notify("utility module missing — silent aim disabled", 5)
         return
     end
 
@@ -158,7 +158,7 @@ local function setupSilentAim()
         return X.original(table.unpack(args))
     end
 
-    Library:Notify("Silent aim active")
+    Library:Notify("silent aim active")
 end
 
 Library:OnUnload(function()
@@ -178,36 +178,42 @@ local Window = Library:CreateWindow({
     AutoShow = true,
 })
 
-local CombatTab = Window:AddTab("Combat")
-local Main = CombatTab:AddLeftGroupbox("Silent Aim")
+local CombatTab = Window:AddTab("combat")
+local Main = CombatTab:AddLeftGroupbox("silent aim")
+
+local boneMap = {
+    head = "Head",
+    humanoidrootpart = "HumanoidRootPart",
+    uppertorso = "UpperTorso",
+}
 
 Main:AddToggle("SilentAim", {
-    Text = "Enabled",
+    Text = "enabled",
     Default = true,
     Callback = function(v) X.enabled = v end,
 })
 
 Main:AddToggle("VisibleOnly", {
-    Text = "Visible Only",
+    Text = "visible only",
     Default = true,
     Callback = function(v) X.visibleOnly = v end,
 })
 
 Main:AddToggle("TeamCheck", {
-    Text = "Team Check",
+    Text = "team check",
     Default = true,
     Callback = function(v) X.teamCheck = v end,
 })
 
 Main:AddDropdown("TargetBone", {
-    Text = "Target Bone",
-    Values = { "Head", "HumanoidRootPart", "UpperTorso" },
+    Text = "target bone",
+    Values = { "head", "humanoidrootpart", "uppertorso" },
     Default = 1,
-    Callback = function(v) X.bone = v end,
+    Callback = function(v) X.bone = boneMap[v] or v end,
 })
 
 Main:AddSlider("FOV", {
-    Text = "FOV Radius",
+    Text = "fov radius",
     Default = 500,
     Min = 50,
     Max = 1000,
@@ -216,18 +222,18 @@ Main:AddSlider("FOV", {
 })
 
 Main:AddDivider()
-Main:AddButton("Unload UI", unloadMist)
+Main:AddButton("unload ui", unloadMist)
 
-local SettingsTab = Window:AddTab("Settings")
-local MenuGroup = SettingsTab:AddLeftGroupbox("Menu")
+local SettingsTab = Window:AddTab("settings")
+local MenuGroup = SettingsTab:AddLeftGroupbox("menu")
 
-MenuGroup:AddButton("Unload UI", unloadMist)
+MenuGroup:AddButton("unload ui", unloadMist)
 MenuGroup:AddDivider()
 
-MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
+MenuGroup:AddLabel("menu bind"):AddKeyPicker("MenuKeybind", {
     Default = "Insert",
     NoUI = false,
-    Text = "Toggle UI",
+    Text = "toggle ui",
     Mode = "Toggle",
 })
 
@@ -242,4 +248,4 @@ end
 
 task.spawn(setupSilentAim)
 
-Library:Notify("Mist v" .. VERSION .. " loaded — Unload UI in Combat tab")
+Library:Notify("mist v" .. VERSION .. " loaded")
