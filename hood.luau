@@ -1,9 +1,9 @@
--- mist · realistic hood testing v1.0.3
+-- mist · realistic hood testing v1.0.4
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local VERSION = "1.0.3"
+local VERSION = "1.0.4"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -26,16 +26,30 @@ local function httpGet(url)
     error("[mist hood] no http method available")
 end
 
+local function getExecEnv()
+    if getgenv then
+        return getgenv()
+    end
+    if getfenv then
+        return getfenv(0)
+    end
+    return _G
+end
+
 local function compile(src, chunkname)
     if not src or #src < 50 then
         error("[mist hood] empty response for " .. chunkname)
     end
+    local env = getExecEnv()
     local fn, err
     if load then
-        fn, err = load(src, chunkname)
+        fn, err = load(src, chunkname, "t", env)
     end
     if not fn and loadstring then
         fn, err = loadstring(src, chunkname)
+        if fn and setfenv then
+            setfenv(fn, env)
+        end
     end
     if not fn then
         error("[mist hood] compile failed (" .. chunkname .. "): " .. tostring(err))
