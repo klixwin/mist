@@ -1,4 +1,7 @@
-local URL = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/rivals.lua"
+local sources = {
+    "https://cdn.jsdelivr.net/gh/klixwin/mist@main/core.lua",
+    "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/core.lua",
+}
 
 local function fetch(url)
     local busted = url .. "?b=" .. tostring(tick())
@@ -17,4 +20,10 @@ local function fetch(url)
     return game:HttpGet(busted)
 end
 
-loadstring(fetch(URL))()
+for _, url in ipairs(sources) do
+    local src = fetch(url)
+    if src and #src > 100 then
+        loadstring(src)()
+        return
+    end
+end
