@@ -1,5 +1,5 @@
--- Mist Rivals v1.3
-local VERSION = "1.3"
+-- Mist Rivals v1.4
+local VERSION = "1.4"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/main/"
 
 if getgenv().Library and getgenv().Library.Unload then
@@ -192,6 +192,16 @@ MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
 })
 
 Library.ToggleKeybind = Options.MenuKeybind
+
+MenuGroup:AddButton("Unload UI", function()
+    Library:Unload()
+end)
+
+Library:OnUnload(function()
+    if X.mod and X.original then
+        X.mod.Raycast = X.original
+    end
+end)
 
 ThemeManager:ApplyToTab(SettingsTab)
 SaveManager:BuildConfigSection(SettingsTab)
