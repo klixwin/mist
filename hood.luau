@@ -31,6 +31,8 @@ local function normalizeVersion(text)
     return text:match("^v?([%d%.]+)$") or text:match("([%d%.]+)") or text
 end
 
+local localVersion = normalizeVersion(VERSION)
+
 local function getExpectedVersion()
     if readfile and isfile and isfile("version.txt") then
         return normalizeVersion(readfile("version.txt"))
@@ -56,7 +58,6 @@ local function getExpectedVersion()
 end
 
 local remoteVersion = getExpectedVersion()
-local localVersion = normalizeVersion(VERSION)
 
 if localVersion ~= remoteVersion then
     error(
