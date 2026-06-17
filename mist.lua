@@ -1,5 +1,5 @@
--- mist loader v1.0.8
-local EXPECTED_VERSION = "1.0.8"
+-- mist loader v1.0.9
+local EXPECTED_VERSION = "1.0.9"
 local REPO = "https://raw.githubusercontent.com/klixwin/mist/refs/heads/main/"
 
 local function httpGet(url)
@@ -22,30 +22,31 @@ local function httpGet(url)
     error("[mist] no http method available")
 end
 
+local function getRealEnv()
+    if getrenv then
+        return getrenv()
+    end
+    if getfenv then
+        return getfenv(0)
+    end
+    return _G
+end
+
 local function isValidHood(src)
     if not src or #src < 100 then
-        return false
-    end
-    if src:find("function getgenv().", 1, true) then
-        return false
-    end
-    if src:find("sneeky-s-fov-lib", 1, true) then
-        return false
-    end
-    if src:find("setfenv%(fn, getfenv", 1, true) then
         return false
     end
     if not src:find('VERSION = "' .. EXPECTED_VERSION .. '"', 1, true) then
         return false
     end
-    if not src:find("loadstring(fetchUrl(path), path)", 1, true) then
+    if not src:find("getRealEnv", 1, true) then
         return false
     end
     return true
 end
 
 local function fetchHood()
-    local bust = tostring(tick()) .. tostring(os and os.clock and os.clock() or "")
+    local bust = tostring(tick())
     local urls = {
         REPO .. "hood.luau?nocache=" .. bust,
         "https://cdn.jsdelivr.net/gh/klixwin/mist@main/hood.luau?nocache=" .. bust,
@@ -61,4 +62,11 @@ local function fetchHood()
     error("[mist] could not fetch hood.luau v" .. EXPECTED_VERSION)
 end
 
-loadstring(fetchHood(), "hood.luau")()
+local fn, err = loadstring(fetchHood(), "hood.luau")
+if not fn then
+    error("[mist] compile hood: " .. tostring(err))
+end
+if setfenv then
+    setfenv(fn, getRealEnv())
+end
+fn()
